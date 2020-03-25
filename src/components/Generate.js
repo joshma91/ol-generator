@@ -5,7 +5,9 @@ import {
   Loader,
   Button,
   Message,
-  Progress
+  Form,
+  Input,
+  Divider
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
@@ -14,6 +16,8 @@ import OpenLawForm from "openlaw-elements";
 
 export default function Dispute() {
   const [apiClient, setapiClient] = useState();
+  const [templateName, setTemplateName] = useState();
+  const [form, setForm] = useState();
   const [state, setState] = useState({
     // Variables for OpenLaw API
     openLawConfig: null,
@@ -39,11 +43,13 @@ export default function Dispute() {
   };
 
   const instantiateOLClient = async () => {
+    setState({...state, executionResult: null, loading: true})
+
     const newapiClient = new APIClient("https://lib.openlaw.io/api/v1/default");
     newapiClient.login(openLawConfig.userName, openLawConfig.password);
 
     //Retrieve your OpenLaw template by name, use async/await
-    const template = await newapiClient.getTemplate(openLawConfig.templateName);
+    const template = await newapiClient.getTemplate(templateName);
 
     //pull properties off of JSON and make into variables
     const title = template.title;
@@ -55,7 +61,6 @@ export default function Dispute() {
     if (compiledTemplate.isError) {
       throw "template error" + compiledTemplate.errorMessage;
     }
-
     const parameters = {};
     const { executionResult, errorMessage } = await Openlaw.execute(
       compiledTemplate.compiledTemplate,
@@ -74,19 +79,52 @@ export default function Dispute() {
       compiledTemplate,
       parameters,
       executionResult,
-      variables
+      variables,
+      loading: false
     });
   };
 
-  useEffect(() => {}, [state.loading]);
-
   useEffect(() => {
-    instantiateOLClient();
-  }, []);
+    if (!state.executionResult && state.loading) {
+      setForm(<Loader active />);
+    } else if (state.executionResult && !state.loading) {
+      setForm(
+        <div className="App">
+          <Container>
+            <OpenLawForm
+              apiClient={apiClient}
+              executionResult={state.executionResult}
+              parameters={state.parameters}
+              onChangeFunction={onChange}
+              openLaw={Openlaw}
+              variables={state.variables}
+            />
+            <div className="button-group">
+              <Button onClick={setTemplatePreview}>Preview</Button>
+              <Button primary loading={state.loading} onClick={onSubmit}>
+                Submit
+              </Button>
+            </div>
+
+            <Message
+              style={state.success ? { display: "block" } : { display: "none" }}
+              className="success-message"
+              positive
+              id="success"
+            >
+              <Message.Header>Submission Successful</Message.Header>
+              <p>
+                Check your <b>e-mail</b> to sign contract
+              </p>
+            </Message>
+            <AgreementPreview id="preview" previewHTML={state.previewHTML} />
+          </Container>
+        </div>
+      );
+    }
+  }, [state.loading]);
 
   const buildOpenLawParamsObj = async (template, creatorId) => {
-
-
     const object = {
       templateId: template.id,
       title: template.title,
@@ -179,38 +217,22 @@ export default function Dispute() {
     setState({ ...state, parameters, variables, executionResult });
   };
 
-  if (!state.executionResult) return <Loader active />;
   return (
-    <div className="App">
-      <Container>
-        <OpenLawForm
-          apiClient={apiClient}
-          executionResult={state.executionResult}
-          parameters={state.parameters}
-          onChangeFunction={onChange}
-          openLaw={Openlaw}
-          variables={state.variables}
+    <>
+      <Form>
+        <Form.Field
+          control={Input}
+          placeholder="Template Name"
+          label="OpenLaw Template Name"
+          value={templateName}
+          onChange={e => setTemplateName(e.target.value)}
         />
-        <div className="button-group">
-          <Button onClick={setTemplatePreview}>prev</Button>
-          <Button primary loading={state.loading} onClick={onSubmit}>
-            Submit
-          </Button>
-        </div>
-
-        <Message
-          style={state.success ? { display: "block" } : { display: "none" }}
-          className="success-message"
-          positive
-          id="success"
-        >
-          <Message.Header>Submission Successful</Message.Header>
-          <p>
-            Check your <b>e-mail</b> to sign contract
-          </p>
-        </Message>
-        <AgreementPreview id="preview" previewHTML={state.previewHTML} />
-      </Container>
-    </div>
+        <Button type="submit" onClick={() => instantiateOLClient()}>
+          Submit
+        </Button>
+      </Form>
+      <Divider/>
+      {form}
+    </>
   );
 }
