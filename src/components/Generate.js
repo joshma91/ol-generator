@@ -1,85 +1,60 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { APIClient, Openlaw } from "openlaw";
-import { Container, Loader, Button, Message } from "semantic-ui-react";
+import {
+  Container,
+  Loader,
+  Button,
+  Message,
+  Progress
+} from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
-import OpenLawForm from "openlaw-elements";
 import AgreementPreview from "./AgreementPreview";
-import "../App.css";
-//require("dotenv").config();
+import OpenLawForm from "openlaw-elements";
 
-const openLawConfig = {
-  server: process.env.REACT_APP_URL,
-  templateName: process.env.REACT_APP_TEMPLATE_NAME,
-  userName: process.env.REACT_APP_OPENLAW_USER,
-  password: process.env.REACT_APP_OPENLAW_PASSWORD
-};
+export default function Dispute() {
+  const [apiClient, setapiClient] = useState();
+  const [state, setState] = useState({
+    // Variables for OpenLaw API
+    openLawConfig: null,
+    templateName: null,
 
-console.log(openLawConfig.templateName);
-const apiClient = new APIClient({
-  root: openLawConfig.server,
-  auth: {
-    username: openLawConfig.userName,
-    password: openLawConfig.password
-  }
-});
-
-class Generate extends React.Component {
-  //initial state of variables for Assignment Template, and web3,etc
-  state = {
     // State variables for OpenLaw
     title: "",
     template: "",
-    creatorId: "",
     compiledTemplate: null,
     parameters: {},
     executionResult: null,
     variables: null,
-    draftId: "",
-
-    // State variables for preview component
-    previewHTML: null,
     loading: false,
-    success: false
+    success: false,
+    previewHTML: null
+  });
+
+  const openLawConfig = {
+    server: process.env.REACT_APP_URL,
+    templateName: process.env.REACT_APP_TEMPLATE_NAME,
+    userName: process.env.REACT_APP_OPENLAW_USER,
+    password: process.env.REACT_APP_OPENLAW_PASSWORD
   };
 
-  componentDidMount = async () => {
-    console.log(APIClient);
-    //const { web3, accounts, contract } = this.props;
-    //create an instance of the API client with url as parameter
-    apiClient
-      .login(openLawConfig.userName, openLawConfig.password)
-      .then(console.log);
+  const instantiateOLClient = async () => {
+    const newapiClient = new APIClient("https://lib.openlaw.io/api/v1/default");
+    newapiClient.login(openLawConfig.userName, openLawConfig.password);
 
     //Retrieve your OpenLaw template by name, use async/await
-    const template = await apiClient.getTemplate(openLawConfig.templateName);
-    console.log(template);
+    const template = await newapiClient.getTemplate(openLawConfig.templateName);
 
     //pull properties off of JSON and make into variables
     const title = template.title;
 
     //Retreive the OpenLaw Template, including MarkDown
     const content = template.content;
-    console.log("template..", template);
 
-    //Get the most recent version of the OpenLaw API Tutorial Template
-    const versions = await apiClient.getTemplateVersions(
-      openLawConfig.templateName,
-      20,
-      1
-    );
-    console.log("versions..", versions[0], versions.length);
-
-    //Get the creatorID from the template.
-    const creatorId = versions[0].creatorId;
-    console.log("creatorId..", creatorId);
-
-    //Get my compiled Template, for use in rendering the HTML in previewTemplate
     const compiledTemplate = await Openlaw.compileTemplate(content);
     if (compiledTemplate.isError) {
       throw "template error" + compiledTemplate.errorMessage;
     }
-    console.log("my compiled template..", compiledTemplate);
 
     const parameters = {};
     const { executionResult, errorMessage } = await Openlaw.execute(
@@ -88,20 +63,14 @@ class Generate extends React.Component {
       parameters
     );
 
-    console.log("execution result:", executionResult);
-
-    // ** This is helpful for logging in development, or throwing exceptions at runtime.
-    if (errorMessage) {
-      console.error("Openlaw Execution Error:", errorMessage);
-    }
-
     const variables = await Openlaw.getExecutedVariables(executionResult, {});
-    console.log("variables:", variables);
 
-    this.setState({
+    setapiClient(newapiClient);
+    setState({
+      ...state,
+      openLawConfig,
       title,
       template,
-      creatorId,
       compiledTemplate,
       parameters,
       executionResult,
@@ -109,32 +78,74 @@ class Generate extends React.Component {
     });
   };
 
-  onChange = (key, value) => {
-    const { compiledTemplate } = this.state;
-    const parameters = key
-      ? {
-          ...this.state.parameters,
-          [key]: value
-        }
-      : this.state.parameters;
+  useEffect(() => {}, [state.loading]);
 
-    const { executionResult, errorMessage } = Openlaw.execute(
-      compiledTemplate.compiledTemplate,
-      {},
-      parameters
-    );
-    const variables = Openlaw.getExecutedVariables(executionResult, {});
-    this.setState({ parameters, variables, executionResult });
+  useEffect(() => {
+    instantiateOLClient();
+  }, []);
+
+  const buildOpenLawParamsObj = async (template, creatorId) => {
+
+
+    const object = {
+      templateId: template.id,
+      title: template.title,
+      text: template.content,
+      creator: "Ross Campbell",
+      parameters: state.parameters,
+      overriddenParagraphs: {},
+      agreements: {},
+      readonlyEmails: [],
+      editEmails: [],
+      draftId: ""
+    };
+    return object;
   };
 
-  setTemplatePreview = async () => {
-    const { parameters, compiledTemplate } = this.state;
-    console.log(parameters);
+  const onSubmit = async () => {
+    try {
+      //login to api
+      setState({ ...state, loading: true });
+      apiClient.login(openLawConfig.userName, openLawConfig.password);
+      console.log("apiClient logged in");
 
+      //add Open Law params to be uploaded
+      const uploadParams = await buildOpenLawParamsObj(
+        state.template,
+        state.creatorId
+      );
+      console.log("parmeters from user..", uploadParams.parameters);
+      console.log("all parameters uploading...", uploadParams);
+
+      //uploadDraft, sends a draft contract to "Draft Management", which can be edited.
+      const draftId = await apiClient.uploadDraft(uploadParams);
+      console.log("draft id..", draftId);
+
+      const contractParams = {
+        ...uploadParams,
+        draftId
+      };
+      console.log(contractParams);
+
+      const contractId = await apiClient.uploadContract(contractParams);
+      console.log(contractId);
+
+      await apiClient.sendContract([], [], contractId);
+
+      await setState({ ...state, loading: false, success: true, draftId });
+      document.getElementById("success").scrollIntoView({
+        behavior: "smooth"
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const setTemplatePreview = async () => {
     const executionResult = await Openlaw.execute(
-      compiledTemplate.compiledTemplate,
+      state.compiledTemplate.compiledTemplate,
       {},
-      parameters
+      state.parameters
     );
     const agreements = await Openlaw.getAgreements(
       executionResult.executionResult
@@ -143,100 +154,52 @@ class Generate extends React.Component {
       agreements[0].agreement,
       {}
     );
-    await this.setState({ previewHTML });
+    await setState({ ...state, previewHTML });
     document.getElementById("preview").scrollIntoView({
       behavior: "smooth"
     });
   };
 
-  buildOpenLawParamsObj = async (template, creatorId) => {
-    const { parameters, draftId } = this.state;
+  const onChange = (key, value) => {
+    const parameters = key
+      ? {
+          ...state.parameters,
+          [key]: [key].includes("Email")
+            ? JSON.stringify({ email: value })
+            : value
+        }
+      : state.parameters;
 
-    const object = {
-      templateId: template.id,
-      title: template.title,
-      text: template.content,
-      creator: creatorId,
-      parameters,
-      overriddenParagraphs: {},
-      agreements: {},
-      readonlyEmails: [],
-      editEmails: [],
-      draftId
-    };
-    return object;
+    const { executionResult, errorMessage } = Openlaw.execute(
+      state.compiledTemplate.compiledTemplate,
+      {},
+      parameters
+    );
+    const variables = Openlaw.getExecutedVariables(executionResult, {});
+    setState({ ...state, parameters, variables, executionResult });
   };
 
-  onSubmit = async () => {
-    try {
-      //login to api
-      this.setState({ loading: true }, async () => {
-        apiClient.login(openLawConfig.userName, openLawConfig.password);
-        console.log("apiClient logged in");
-
-        //add Open Law params to be uploaded
-        const uploadParams = await this.buildOpenLawParamsObj(
-          this.state.template,
-          this.state.creatorId
-        );
-        console.log("parmeters from user..", uploadParams.parameters);
-        console.log("all parameters uploading...", uploadParams);
-
-        //uploadDraft, sends a draft contract to "Draft Management", which can be edited.
-        const draftId = await apiClient.uploadDraft(uploadParams);
-        console.log("draft id..", draftId);
-
-        const contractParams = {
-          ...uploadParams,
-          draftId
-        };
-        console.log(contractParams);
-
-        const contractId = await apiClient.uploadContract(contractParams);
-        console.log(contractId);
-
-        await apiClient.sendContract([], [], contractId);
-
-        await this.setState({ loading: false, success: true, draftId });
-        document.getElementById("success").scrollIntoView({
-          behavior: "smooth"
-        });
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  render() {
-    const {
-      variables,
-      parameters,
-      executionResult,
-      previewHTML,
-      loading,
-      success
-    } = this.state;
-    if (!executionResult) return <Loader active />;
-    return (
-      <Container text style={{ marginTop: "2em" }}>
-        <h1>Summon  an OpenLaw Template</h1>
+  if (!state.executionResult) return <Loader active />;
+  return (
+    <div className="App">
+      <Container>
         <OpenLawForm
           apiClient={apiClient}
-          executionResult={executionResult}
-          parameters={parameters}
-          onChangeFunction={this.onChange}
+          executionResult={state.executionResult}
+          parameters={state.parameters}
+          onChangeFunction={onChange}
           openLaw={Openlaw}
-          variables={variables}
+          variables={state.variables}
         />
         <div className="button-group">
-          <Button onClick={this.setTemplatePreview}>Preview</Button>
-          <Button primary loading={loading} onClick={this.onSubmit}>
+          <Button onClick={setTemplatePreview}>prev</Button>
+          <Button primary loading={state.loading} onClick={onSubmit}>
             Submit
           </Button>
         </div>
 
         <Message
-          style={success ? { display: "block" } : { display: "none" }}
+          style={state.success ? { display: "block" } : { display: "none" }}
           className="success-message"
           positive
           id="success"
@@ -246,10 +209,8 @@ class Generate extends React.Component {
             Check your <b>e-mail</b> to sign contract
           </p>
         </Message>
-        <AgreementPreview id="preview" previewHTML={previewHTML} />
+        <AgreementPreview id="preview" previewHTML={state.previewHTML} />
       </Container>
-    );
-  }
+    </div>
+  );
 }
-
-export default Generate;
