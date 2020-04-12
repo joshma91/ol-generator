@@ -1,0 +1,19 @@
+{
+  "name": "ol-generator-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js",
+    "prisma": "prisma"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "graphql-yoga": "^1.7.0",
+    "jsonwebtoken": "^8.2.0",
+    "prisma-client-lib": "^1.34.10"
+  },
+  "devDependencies": {
+    "prisma": "^1.31.0"
+  }
+}

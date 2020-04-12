@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "apollo-boost": "^0.4.7",
+    "graphql": "^15.0.0",
     "html-react-parser": "^0.7.0",
     "openlaw": "^0.2.3",
     "openlaw-elements": "^1.0.0-beta.19",
     "react": "^16.8.6",
+    "react-apollo": "^3.1.4",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
     "semantic-ui-css": "^2.4.1",
