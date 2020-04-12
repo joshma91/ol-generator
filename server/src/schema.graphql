@@ -1,0 +1,14 @@
+type Query {
+  templates: [Template!]!
+}
+
+
+type Template {
+  id: ID!
+  description: String!
+  name: String!
+}
+
+type Mutation {
+  save(name: String!, description: String!): Template!
+}
