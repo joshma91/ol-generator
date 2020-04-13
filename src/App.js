@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import _ from "lodash";
+
 import Generate from "./components/Generate";
 import {
   Button,
@@ -12,6 +13,7 @@ import {
   Header
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
+
 
 export default function App() {
   const [index, setIndex] = useState(0);
@@ -28,7 +30,7 @@ export default function App() {
   const handleToggle = () => setVisible(!visible);
 
   const renderForm = () => {
-    if (index == 0) return <Generate />;
+    if (index == 0) return <Generate  />;
   };
 
   const leftItems = [
@@ -139,4 +141,3 @@ const NavBarDesktop = ({ leftItems }) => (
 const NavBarChildren = ({ children }) => (
   <Container style={{ marginTop: "5em" }}>{children}</Container>
 );
-

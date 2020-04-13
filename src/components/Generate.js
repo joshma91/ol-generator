@@ -13,11 +13,24 @@ import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 import AgreementPreview from "./AgreementPreview";
 import OpenLawForm from "openlaw-elements";
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+
+export const TEST_QUERY = gql`
+  query {
+    templates {
+      id
+      description
+      name
+    }
+  }
+`;
 
 export default function Dispute() {
   const [apiClient, setapiClient] = useState();
   const [templateName, setTemplateName] = useState();
   const [form, setForm] = useState();
+  const [query, setQuery] = useState();
   const [state, setState] = useState({
     // Variables for OpenLaw API
     openLawConfig: null,
@@ -43,7 +56,7 @@ export default function Dispute() {
   };
 
   const instantiateOLClient = async () => {
-    setState({...state, executionResult: null, loading: true})
+    setState({ ...state, executionResult: null, loading: true });
 
     const newapiClient = new APIClient("https://lib.openlaw.io/api/v1/default");
     newapiClient.login(openLawConfig.userName, openLawConfig.password);
@@ -84,6 +97,30 @@ export default function Dispute() {
     });
   };
 
+  const uploadTemplateID = () => {
+    setQuery(
+      <Query query={TEST_QUERY}>
+        {({ loading, error, data, subscribeToMore }) => {
+          if (loading) return <div>Fetching</div>;
+          if (error) return <div>Error</div>;
+          return (
+            <React.Fragment>
+              {data.templates.map(template => {
+                return (
+                  <ul>
+                    <li>{template.id}</li>
+                    <li>{template.description}</li>
+                    <li>{template.name}</li>
+                  </ul>
+                );
+              })}
+            </React.Fragment>
+          );
+        }}
+      </Query>
+    );
+  };
+
   useEffect(() => {
     if (!state.executionResult && state.loading) {
       setForm(<Loader active />);
@@ -121,6 +158,7 @@ export default function Dispute() {
           </Container>
         </div>
       );
+      uploadTemplateID();
     }
   }, [state.loading]);
 
@@ -231,7 +269,8 @@ export default function Dispute() {
           Submit
         </Button>
       </Form>
-      <Divider/>
+      {query}
+      <Divider />
       {form}
     </>
   );
