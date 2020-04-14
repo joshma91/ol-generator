@@ -40,10 +40,6 @@ class OLForm extends React.Component {
     success: false
   };
 
-  componentWillReceiveProps({templateName}) {
-    this.setState({templateName})
-  }
-
   componentDidMount = async () => {
     console.log(openLawConfig.userName);
     //const { web3, accounts, contract } = this.props;
@@ -106,7 +102,7 @@ class OLForm extends React.Component {
       compiledTemplate,
       parameters,
       executionResult,
-      variables
+      variables,
     });
 
     this.props.setLoadSuccess(true)
@@ -223,7 +219,7 @@ class OLForm extends React.Component {
     if (!executionResult) return <Loader active />;
     return (
       <Container text style={{ marginTop: "2em" }}>
-        <h1>{this.props.templateName.toUpperCase()}</h1>
+        <h1>{this.state.templateName.toUpperCase()}</h1>
         <OpenLawForm
           apiClient={apiClient}
           executionResult={executionResult}

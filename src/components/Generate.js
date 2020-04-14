@@ -14,12 +14,24 @@ import "openlaw-elements/dist/openlaw-elements.min.css";
 import AgreementPreview from "./AgreementPreview";
 import OLForm from "./OLForm";
 import OpenLawForm from "openlaw-elements";
-import { Query } from "react-apollo";
+import { Query, Mutation } from "react-apollo";
+import { useMutation } from '@apollo/react-hooks';
+
 import gql from "graphql-tag";
 
-export const TEST_QUERY = gql`
+const TEST_QUERY = gql`
   query {
     templates {
+      id
+      description
+      name
+    }
+  }
+`;
+
+const SAVE_MUTATION = gql`
+  mutation($name: String!, $description: String!) {
+    save(name: $name, description: $description) {
       id
       description
       name
@@ -33,6 +45,7 @@ export default function Generate() {
   const [templateName, setTemplateName] = useState(null);
   const [loadSuccess, setLoadSuccess] = useState();
   const [query, setQuery] = useState();
+  const [saveTemplate] = useMutation(SAVE_MUTATION)
 
   const openLawConfig = {
     server: process.env.REACT_APP_URL,
@@ -42,12 +55,15 @@ export default function Generate() {
   };
 
   const instantiateOLClient = async () => {
-    setLoadSuccess(false)
-    setShow(true)
-    setKey(key+1)
-  }
+    setLoadSuccess(false);
+    setShow(true);
+    setKey(key + 1);
+  };
 
-  const uploadTemplateID = () => {
+  const uploadTemplateID = async () => {
+    const res = await saveTemplate({variables: { name: templateName, description: templateName }})
+
+    console.log(res)
     setQuery(
       <Query query={TEST_QUERY}>
         {({ loading, error, data, subscribeToMore }) => {
@@ -72,11 +88,9 @@ export default function Generate() {
   };
 
   useEffect(() => {
-    console.log(showOLForm, loadSuccess)
-    if (showOLForm && loadSuccess) 
-    uploadTemplateID();
+    console.log(showOLForm, loadSuccess);
+    if (showOLForm && loadSuccess) uploadTemplateID();
   }, [loadSuccess]);
-
 
   return (
     <>
@@ -94,7 +108,13 @@ export default function Generate() {
       </Form>
       {query}
       <Divider />
-      {showOLForm ? <OLForm setLoadSuccess={setLoadSuccess} key={key} templateName={templateName} /> : null}
+      {showOLForm ? (
+        <OLForm
+          setLoadSuccess={setLoadSuccess}
+          key={key}
+          templateName={templateName}
+        />
+      ) : null}
     </>
   );
 }
