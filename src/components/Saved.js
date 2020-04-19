@@ -4,7 +4,8 @@ import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 import OLForm from "./OLForm";
 import { Query } from "react-apollo";
-import TemplateList from "./TemplateList"
+import TemplateList from "./TemplateList";
+import Template from "./Template";
 import { useQuery } from "@apollo/react-hooks";
 
 import gql from "graphql-tag";
@@ -22,13 +23,18 @@ const TEMPLATES_QUERY = gql`
 export default function Generate() {
   const [template, setTemplate] = useState(null);
 
-  const { loading, data, error } = useQuery(TEMPLATES_QUERY)
-
-
+  const { loading, data, error } = useQuery(TEMPLATES_QUERY);
 
   return (
     <>
-      <TemplateList loading={loading} error={error} data={data}/>
+      <h2>Select a Saved Template</h2>
+      <TemplateList
+        loading={loading}
+        error={error}
+        data={data}
+        setTemplate={setTemplate}
+      />
+      <Template />
     </>
   );
 }
