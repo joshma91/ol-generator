@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import _ from "lodash";
 
 import Generate from "./components/Generate";
+import Saved from "./components/Saved"
 import {
   Button,
   Container,
@@ -31,6 +32,7 @@ export default function App() {
 
   const renderForm = () => {
     if (index == 0) return <Generate  />;
+    if (index == 1) return <Saved />
   };
 
   const leftItems = [
@@ -42,6 +44,15 @@ export default function App() {
         setVisible(false);
       },
       key: "Generate"
+    },
+    {
+      as: "a",
+      content: "Saved Templates",
+      onClick: () => {
+        setIndex(1);
+        setVisible(false);
+      },
+      key: "Saved"
     }
   ];
   return (
