@@ -4,11 +4,12 @@ import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 import OLForm from "./OLForm";
 import { Query } from "react-apollo";
-import { useMutation } from "@apollo/react-hooks";
+import TemplateList from "./TemplateList"
+import { useQuery } from "@apollo/react-hooks";
 
 import gql from "graphql-tag";
 
-const TEST_QUERY = gql`
+const TEMPLATES_QUERY = gql`
   query {
     templates {
       id
@@ -18,46 +19,16 @@ const TEST_QUERY = gql`
   }
 `;
 
-const SAVE_MUTATION = gql`
-  mutation($name: String!, $description: String!) {
-    save(name: $name, description: $description) {
-      id
-      description
-      name
-    }
-  }
-`;
-
 export default function Generate() {
-  const [showOLForm, setShow] = useState();
-  const [key, setKey] = useState(0);
-  const [templateName, setTemplateName] = useState(null);
-  const [loadSuccess, setLoadSuccess] = useState();
-  const [query, setQuery] = useState();
-  const [saveTemplate] = useMutation(SAVE_MUTATION);
+  const [template, setTemplate] = useState(null);
+
+  const { loading, data, error } = useQuery(TEMPLATES_QUERY)
+
 
 
   return (
     <>
-      <Query query={TEST_QUERY}>
-        {({ loading, error, data, subscribeToMore }) => {
-          if (loading) return <div>Fetching</div>;
-          if (error) return <div>Error</div>;
-          return (
-            <React.Fragment>
-              {data.templates.map(template => {
-                return (
-                  <ul>
-                    <li>{template.id}</li>
-                    <li>{template.description}</li>
-                    <li>{template.name}</li>
-                  </ul>
-                );
-              })}
-            </React.Fragment>
-          );
-        }}
-      </Query>
+      <TemplateList loading={loading} error={error} data={data}/>
     </>
   );
 }
