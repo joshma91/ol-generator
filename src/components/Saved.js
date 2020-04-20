@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Divider } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
-import OLForm from "./OLForm";
-import { Query } from "react-apollo";
 import TemplateList from "./TemplateList";
 import Template from "./Template";
 import { useQuery } from "@apollo/react-hooks";
@@ -34,7 +32,7 @@ export default function Generate() {
         data={data}
         setTemplate={setTemplate}
       />
-      <Template />
+      <Template template={template}/>
     </>
   );
 }
