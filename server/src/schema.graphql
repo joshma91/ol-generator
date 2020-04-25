@@ -1,3 +1,5 @@
+scalar DateTime
+
 type Query {
   templates: [Template!]!
 }
@@ -7,6 +9,7 @@ type Template {
   id: ID!
   description: String!
   name: String!
+  createdAt: DateTime!
 }
 
 type Mutation {

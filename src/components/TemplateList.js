@@ -6,9 +6,9 @@ import "openlaw-elements/dist/openlaw-elements.min.css";
 export default function TemplateList({ loading, error, data, setTemplate }) {
   const [activeKey, setActiveKey] = useState(null);
 
-  if (loading) return "Loading...";
-  if (error) return "There was an error loading the templates :(";
-  if (!data || !data.templates || !data.templates.length) return "No templates";
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>There was an error loading the templates :(</p>;
+  if (!data || !data.templates || !data.templates.length) return <p>No templates</p>;
 
   return (
     <>
@@ -16,6 +16,7 @@ export default function TemplateList({ loading, error, data, setTemplate }) {
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>OpenLaw Template</Table.HeaderCell>
+            <Table.HeaderCell>Date Added</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -39,6 +40,9 @@ export default function TemplateList({ loading, error, data, setTemplate }) {
                   >
                     {template.name}
                   </span>
+                </Table.Cell>
+                <Table.Cell>
+                  {template.createdAt.substring(0,10)}
                 </Table.Cell>
               </Table.Row>
             );

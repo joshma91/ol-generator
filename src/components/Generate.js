@@ -22,6 +22,7 @@ const SAVE_MUTATION = gql`
   mutation($name: String!, $description: String!) {
     save(name: $name, description: $description) {
       id
+      createdAt
       description
       name
     }

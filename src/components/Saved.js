@@ -14,6 +14,7 @@ const TEMPLATES_QUERY = gql`
       id
       description
       name
+      createdAt
     }
   }
 `;
@@ -25,7 +26,7 @@ export default function Generate() {
 
   return (
     <Grid>
-      <Grid.Column stretched={true} computer={5} tablet={4} mobile={16} >
+      <Grid.Column computer={5} tablet={4} mobile={16} >
         <h2>Select a Saved Template</h2>
         <TemplateList
           loading={loading}
