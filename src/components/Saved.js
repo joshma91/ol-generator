@@ -25,7 +25,7 @@ export default function Generate() {
 
   return (
     <Grid>
-      <Grid.Column width={6}>
+      <Grid.Column stretched={true} computer={5} tablet={4} mobile={16} >
         <h2>Select a Saved Template</h2>
         <TemplateList
           loading={loading}
@@ -34,7 +34,7 @@ export default function Generate() {
           setTemplate={setTemplate}
         />
       </Grid.Column>
-      <Grid.Column width={10}>
+      <Grid.Column computer={5} tablet={4} mobile={16} >
         <Template template={template} />
       </Grid.Column>
     </Grid>

@@ -19,7 +19,8 @@ class OLForm extends React.Component {
 
   constructor({ templateName}) {
     super()
-    this.state = {templateName}
+    const template = templateName.trim()
+    this.state = {templateName: template}
   }
 
   //initial state of variables for Assignment Template, and web3,etc
