@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  Divider
-} from "semantic-ui-react";
+import { Button, Form, Input, Divider, Item } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 import OLForm from "./OLForm";
 import { Query } from "react-apollo";
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from "@apollo/react-hooks";
 
 import gql from "graphql-tag";
 
@@ -33,13 +28,13 @@ const SAVE_MUTATION = gql`
   }
 `;
 
-export default function Generate() {
+export default function Generate({ setIndex, renderForm }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
   const [loadSuccess, setLoadSuccess] = useState();
   const [query, setQuery] = useState();
-  const [saveTemplate] = useMutation(SAVE_MUTATION)
+  const [saveTemplate] = useMutation(SAVE_MUTATION);
 
   const openLawConfig = {
     server: process.env.REACT_APP_URL,
@@ -55,30 +50,39 @@ export default function Generate() {
   };
 
   const uploadTemplateID = async () => {
-    const res = await saveTemplate({variables: { name: templateName, description: templateName }})
-
-    console.log(res)
-    setQuery(
-      <Query query={TEST_QUERY}>
-        {({ loading, error, data, subscribeToMore }) => {
-          if (loading) return <div>Fetching</div>;
-          if (error) return <div>Error</div>;
-          return (
-            <React.Fragment>
-              {data.templates.map(template => {
-                return (
-                  <ul>
-                    <li>{template.id}</li>
-                    <li>{template.description}</li>
-                    <li>{template.name}</li>
-                  </ul>
-                );
-              })}
-            </React.Fragment>
-          );
-        }}
-      </Query>
-    );
+    try {
+      await saveTemplate({
+        variables: { name: templateName, description: templateName }
+      });
+      setQuery(
+        <Item.Description>
+          This template was has been saved for you. View it{" "}
+          <span className="fake-link"
+            onClick={() => {
+              setIndex(1);
+              renderForm();
+            }}
+          >
+            here
+          </span>
+        </Item.Description>
+      );
+    } catch (err) {
+      console.log(err);
+      setQuery(
+        <Item.Description>
+          This template was previously saved. View it{" "}
+          <span className="fake-link"
+            onClick={() => {
+              setIndex(1);
+              renderForm();
+            }}
+          >
+            here
+          </span>
+        </Item.Description>
+      );
+    }
   };
 
   useEffect(() => {
@@ -88,6 +92,7 @@ export default function Generate() {
 
   return (
     <>
+     <h2>View an OpenLaw Template</h2>
       <Form>
         <Form.Field
           control={Input}

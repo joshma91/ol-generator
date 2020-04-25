@@ -8,10 +8,15 @@ const resolvers = {
     }
   },
   Mutation: {
-    save: (root, args, context) => {
+    save: async (root, args, context) => {
+
+      const templates = await context.prisma.templates()
+      const nameArr = templates.map (x => x.name.toUpperCase())
+      if (nameArr.includes(args.name.toUpperCase()))  throw new Error('Template already exists')
+
       return context.prisma.createTemplate({
-        description: args.description,
-        name: args.name
+        description: args.description.toUpperCase(),
+        name: args.name.toUpperCase()
       });
     }
   }

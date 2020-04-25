@@ -31,7 +31,7 @@ export default function App() {
   const handleToggle = () => setVisible(!visible);
 
   const renderForm = () => {
-    if (index == 0) return <Generate  />;
+    if (index == 0) return <Generate renderForm={renderForm} setIndex={setIndex}/>;
     if (index == 1) return <Saved />
   };
 
