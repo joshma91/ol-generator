@@ -20,15 +20,16 @@ const TEMPLATES_QUERY = gql`
   }
 `;
 
-export default function Saved({account}) {
+export default function Saved({account, newKey}) {
   const [template, setTemplate] = useState(null);
   const { loading, data, error } = useQuery(TEMPLATES_QUERY);
-
+ 
   return (
     <Grid>
       <Grid.Column computer={5} tablet={4} mobile={16} >
         <h2>Select a Saved Template</h2>
         <TemplateList
+          key={newKey}
           loading={loading}
           error={error}
           data={data}

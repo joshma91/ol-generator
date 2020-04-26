@@ -3,7 +3,13 @@ import { Table, Radio } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 
-export default function TemplateList({ loading, error, data, setTemplate, account }) {
+export default function TemplateList({
+  loading,
+  error,
+  data,
+  setTemplate,
+  account
+}) {
   const [activeKey, setActiveKey] = useState(null);
   const [checked, setChecked] = useState(false);
 
@@ -14,17 +20,23 @@ export default function TemplateList({ loading, error, data, setTemplate, accoun
 
   return (
     <>
-      <Radio label="show templates I added" toggle value={checked} onClick={() => setChecked(!checked)} />
-      <Table celled striped>
+      <Radio
+        label="Show templates I added"
+        style={{fontWeight:"bold"}}
+        toggle
+        value={checked}
+        onClick={() => setChecked(!checked)}
+      />
+      <Table celled striped >
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>OpenLaw Template</Table.HeaderCell>
-            <Table.HeaderCell>Date Added</Table.HeaderCell>
+            <Table.HeaderCell width={10}>OpenLaw Template</Table.HeaderCell>
+            <Table.HeaderCell width={6}>Date Added</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {data.templates.map((template, i) => {
-            if(checked && account !== template.account) return null
+            if (checked && account !== template.account) return null;
             return (
               <Table.Row
                 style={
@@ -34,7 +46,7 @@ export default function TemplateList({ loading, error, data, setTemplate, accoun
                 }
                 key={i}
               >
-                <Table.Cell>
+                <Table.Cell width={10}>
                   <span
                     className="fake-link"
                     onClick={() => {
@@ -45,7 +57,9 @@ export default function TemplateList({ loading, error, data, setTemplate, accoun
                     {template.name}
                   </span>
                 </Table.Cell>
-                <Table.Cell>{template.createdAt.substring(0, 10)}</Table.Cell>
+                <Table.Cell width={6}>
+                  {template.createdAt.substring(0, 10)}
+                </Table.Cell>
               </Table.Row>
             );
           })}

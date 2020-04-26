@@ -20,8 +20,9 @@ const createDrizzleUtils = require("@drizzle-utils/core");
 export default function App() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState();
-  const [web3, setWeb3] = useState()
-  const [account, setAccount] = useState()
+  const [web3, setWeb3] = useState();
+  const [account, setAccount] = useState();
+  const [key, setKey] = useState(0);
 
   const getWeb3 = async () => {
     // initialize the tooling
@@ -29,12 +30,12 @@ export default function App() {
     const drizzleUtils = await createDrizzleUtils({ web3 });
     const accounts = await drizzleUtils.getAccounts();
 
-    setWeb3(web3)
-    setAccount(accounts[0])
+    setWeb3(web3);
+    setAccount(accounts[0]);
   };
 
   useEffect(() => {
-    getWeb3()
+    getWeb3();
     document.title = "OpenLaw Summoner";
   }, []);
 
@@ -46,8 +47,14 @@ export default function App() {
 
   const renderForm = () => {
     if (index == 0)
-      return <Generate renderForm={renderForm} setIndex={setIndex} account={account} />;
-    if (index == 1) return <Saved account={account}/>;
+      return (
+        <Generate
+          renderForm={renderForm}
+          setIndex={setIndex}
+          account={account}
+        />
+      );
+    if (index == 1) return <Saved key={Math.random()} account={account} />;
   };
 
   const leftItems = [
