@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "semantic-ui-react";
+import { Table, Radio } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 
-export default function TemplateList({ loading, error, data, setTemplate }) {
+export default function TemplateList({ loading, error, data, setTemplate, account }) {
   const [activeKey, setActiveKey] = useState(null);
+  const [checked, setChecked] = useState(false);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>There was an error loading the templates :(</p>;
-  if (!data || !data.templates || !data.templates.length) return <p>No templates</p>;
+  if (!data || !data.templates || !data.templates.length)
+    return <p>No templates</p>;
 
   return (
     <>
-      <Table celled striped collapsing>
+      <Radio label="show templates I added" toggle value={checked} onClick={() => setChecked(!checked)} />
+      <Table celled striped>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>OpenLaw Template</Table.HeaderCell>
@@ -21,6 +24,7 @@ export default function TemplateList({ loading, error, data, setTemplate }) {
         </Table.Header>
         <Table.Body>
           {data.templates.map((template, i) => {
+            if(checked && account !== template.account) return null
             return (
               <Table.Row
                 style={
@@ -41,9 +45,7 @@ export default function TemplateList({ loading, error, data, setTemplate }) {
                     {template.name}
                   </span>
                 </Table.Cell>
-                <Table.Cell>
-                  {template.createdAt.substring(0,10)}
-                </Table.Cell>
+                <Table.Cell>{template.createdAt.substring(0, 10)}</Table.Cell>
               </Table.Row>
             );
           })}

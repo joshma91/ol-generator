@@ -10,8 +10,9 @@ type Template {
   description: String!
   name: String!
   createdAt: DateTime!
+  account: String
 }
 
 type Mutation {
-  save(name: String!, description: String!): Template!
+  save(name: String!, description: String!, account: String): Template!
 }

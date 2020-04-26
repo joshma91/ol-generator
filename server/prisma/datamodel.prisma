@@ -9,4 +9,5 @@ type Template {
   createdAt: DateTime! @createdAt
   description: String!
   name: String!
+  account: String
 }

@@ -16,11 +16,10 @@ const openLawConfig = {
 const apiClient = new APIClient(openLawConfig.server);
 
 class OLForm extends React.Component {
-
-  constructor({ templateName}) {
-    super()
-    const template = templateName.trim()
-    this.state = {templateName: template}
+  constructor({ templateName }) {
+    super();
+    const template = templateName.trim();
+    this.state = { templateName: template };
   }
 
   //initial state of variables for Assignment Template, and web3,etc
@@ -67,7 +66,6 @@ class OLForm extends React.Component {
       1
     );
     console.log("versions..", versions[0], versions.length);
-  
 
     //Get the creatorID from the template.
     const creatorId = versions[0].creatorId;
@@ -104,10 +102,10 @@ class OLForm extends React.Component {
       compiledTemplate,
       parameters,
       executionResult,
-      variables,
+      variables
     });
 
-    this.props.setLoadSuccess(true)
+    this.props.setLoadSuccess(true);
   };
 
   onChange = (key, value) => {

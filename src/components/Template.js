@@ -8,11 +8,12 @@ import OLForm from "./OLForm";
 
 export default function Template({ template }) {
   const [loadSuccess, setLoadSuccess] = useState();
+  useEffect(() => {}, [template]);
 
   if (!template) return null;
   return (
     <>
-      <OLForm setLoadSuccess={setLoadSuccess} templateName={template.name} />
+      <OLForm key={template.name} setLoadSuccess={setLoadSuccess} templateName={template.name} />
     </>
   );
 }

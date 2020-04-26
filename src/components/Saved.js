@@ -15,13 +15,13 @@ const TEMPLATES_QUERY = gql`
       description
       name
       createdAt
+      account
     }
   }
 `;
 
-export default function Generate() {
+export default function Saved({account}) {
   const [template, setTemplate] = useState(null);
-
   const { loading, data, error } = useQuery(TEMPLATES_QUERY);
 
   return (
@@ -33,6 +33,7 @@ export default function Generate() {
           error={error}
           data={data}
           setTemplate={setTemplate}
+          account={account}
         />
       </Grid.Column>
       <Grid.Column computer={5} tablet={4} mobile={16} >

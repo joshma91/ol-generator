@@ -189,6 +189,7 @@ type Template {
   createdAt: DateTime!
   description: String!
   name: String!
+  account: String
 }
 
 type TemplateConnection {
@@ -201,6 +202,7 @@ input TemplateCreateInput {
   id: ID
   description: String!
   name: String!
+  account: String
 }
 
 type TemplateEdge {
@@ -217,6 +219,8 @@ enum TemplateOrderByInput {
   description_DESC
   name_ASC
   name_DESC
+  account_ASC
+  account_DESC
 }
 
 type TemplatePreviousValues {
@@ -224,6 +228,7 @@ type TemplatePreviousValues {
   createdAt: DateTime!
   description: String!
   name: String!
+  account: String
 }
 
 type TemplateSubscriptionPayload {
@@ -247,11 +252,13 @@ input TemplateSubscriptionWhereInput {
 input TemplateUpdateInput {
   description: String
   name: String
+  account: String
 }
 
 input TemplateUpdateManyMutationInput {
   description: String
   name: String
+  account: String
 }
 
 input TemplateWhereInput {
@@ -305,6 +312,20 @@ input TemplateWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  account: String
+  account_not: String
+  account_in: [String!]
+  account_not_in: [String!]
+  account_lt: String
+  account_lte: String
+  account_gt: String
+  account_gte: String
+  account_contains: String
+  account_not_contains: String
+  account_starts_with: String
+  account_not_starts_with: String
+  account_ends_with: String
+  account_not_ends_with: String
   AND: [TemplateWhereInput!]
   OR: [TemplateWhereInput!]
   NOT: [TemplateWhereInput!]

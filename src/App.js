@@ -46,8 +46,8 @@ export default function App() {
 
   const renderForm = () => {
     if (index == 0)
-      return <Generate renderForm={renderForm} setIndex={setIndex} />;
-    if (index == 1) return <Saved />;
+      return <Generate renderForm={renderForm} setIndex={setIndex} account={account} />;
+    if (index == 1) return <Saved account={account}/>;
   };
 
   const leftItems = [

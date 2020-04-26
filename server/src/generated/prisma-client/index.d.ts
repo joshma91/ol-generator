@@ -158,12 +158,15 @@ export type TemplateOrderByInput =
   | "description_ASC"
   | "description_DESC"
   | "name_ASC"
-  | "name_DESC";
+  | "name_DESC"
+  | "account_ASC"
+  | "account_DESC";
 
 export interface TemplateCreateInput {
   id?: Maybe<ID_Input>;
   description: String;
   name: String;
+  account?: Maybe<String>;
 }
 
 export interface LinkUpdateInput {
@@ -274,6 +277,20 @@ export interface TemplateWhereInput {
   name_not_starts_with?: Maybe<String>;
   name_ends_with?: Maybe<String>;
   name_not_ends_with?: Maybe<String>;
+  account?: Maybe<String>;
+  account_not?: Maybe<String>;
+  account_in?: Maybe<String[] | String>;
+  account_not_in?: Maybe<String[] | String>;
+  account_lt?: Maybe<String>;
+  account_lte?: Maybe<String>;
+  account_gt?: Maybe<String>;
+  account_gte?: Maybe<String>;
+  account_contains?: Maybe<String>;
+  account_not_contains?: Maybe<String>;
+  account_starts_with?: Maybe<String>;
+  account_not_starts_with?: Maybe<String>;
+  account_ends_with?: Maybe<String>;
+  account_not_ends_with?: Maybe<String>;
   AND?: Maybe<TemplateWhereInput[] | TemplateWhereInput>;
   OR?: Maybe<TemplateWhereInput[] | TemplateWhereInput>;
   NOT?: Maybe<TemplateWhereInput[] | TemplateWhereInput>;
@@ -323,11 +340,13 @@ export interface TemplateSubscriptionWhereInput {
 export interface TemplateUpdateInput {
   description?: Maybe<String>;
   name?: Maybe<String>;
+  account?: Maybe<String>;
 }
 
 export interface TemplateUpdateManyMutationInput {
   description?: Maybe<String>;
   name?: Maybe<String>;
+  account?: Maybe<String>;
 }
 
 export interface NodeNode {
@@ -358,6 +377,7 @@ export interface TemplatePreviousValues {
   createdAt: DateTimeOutput;
   description: String;
   name: String;
+  account?: String;
 }
 
 export interface TemplatePreviousValuesPromise
@@ -367,6 +387,7 @@ export interface TemplatePreviousValuesPromise
   createdAt: () => Promise<DateTimeOutput>;
   description: () => Promise<String>;
   name: () => Promise<String>;
+  account: () => Promise<String>;
 }
 
 export interface TemplatePreviousValuesSubscription
@@ -376,6 +397,7 @@ export interface TemplatePreviousValuesSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   description: () => Promise<AsyncIterator<String>>;
   name: () => Promise<AsyncIterator<String>>;
+  account: () => Promise<AsyncIterator<String>>;
 }
 
 export interface TemplateConnection {
@@ -464,6 +486,7 @@ export interface Template {
   createdAt: DateTimeOutput;
   description: String;
   name: String;
+  account?: String;
 }
 
 export interface TemplatePromise extends Promise<Template>, Fragmentable {
@@ -471,6 +494,7 @@ export interface TemplatePromise extends Promise<Template>, Fragmentable {
   createdAt: () => Promise<DateTimeOutput>;
   description: () => Promise<String>;
   name: () => Promise<String>;
+  account: () => Promise<String>;
 }
 
 export interface TemplateSubscription
@@ -480,6 +504,7 @@ export interface TemplateSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   description: () => Promise<AsyncIterator<String>>;
   name: () => Promise<AsyncIterator<String>>;
+  account: () => Promise<AsyncIterator<String>>;
 }
 
 export interface TemplateNullablePromise
@@ -489,6 +514,7 @@ export interface TemplateNullablePromise
   createdAt: () => Promise<DateTimeOutput>;
   description: () => Promise<String>;
   name: () => Promise<String>;
+  account: () => Promise<String>;
 }
 
 export interface LinkSubscriptionPayload {

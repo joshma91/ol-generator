@@ -19,24 +19,24 @@ const TEST_QUERY = gql`
 `;
 
 const SAVE_MUTATION = gql`
-  mutation($name: String!, $description: String!) {
-    save(name: $name, description: $description) {
+  mutation($name: String!, $description: String!, $account: String) {
+    save(name: $name, description: $description, account: $account) {
       id
       createdAt
       description
       name
+      account
     }
   }
 `;
 
-export default function Generate({ setIndex, renderForm }) {
+export default function Generate({ setIndex, renderForm, account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
   const [loadSuccess, setLoadSuccess] = useState();
   const [query, setQuery] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
-  const [account, setAccount] = useState();
   
   const openLawConfig = {
     server: process.env.REACT_APP_URL,
@@ -54,7 +54,7 @@ export default function Generate({ setIndex, renderForm }) {
   const uploadTemplateID = async () => {
     try {
       await saveTemplate({
-        variables: { name: templateName, description: templateName }
+        variables: { name: templateName, description: templateName, account: account }
       });
       setQuery(
         <Item.Description>
