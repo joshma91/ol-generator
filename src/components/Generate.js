@@ -36,7 +36,8 @@ export default function Generate({ setIndex, renderForm }) {
   const [loadSuccess, setLoadSuccess] = useState();
   const [query, setQuery] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
-
+  const [account, setAccount] = useState();
+  
   const openLawConfig = {
     server: process.env.REACT_APP_URL,
     templateName: process.env.REACT_APP_TEMPLATE_NAME,
@@ -87,7 +88,6 @@ export default function Generate({ setIndex, renderForm }) {
   };
 
   useEffect(() => {
-    console.log(showOLForm, loadSuccess);
     if (showOLForm && loadSuccess) uploadTemplateID();
   }, [loadSuccess]);
 

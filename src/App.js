@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import _ from "lodash";
 
 import Generate from "./components/Generate";
-import Saved from "./components/Saved"
+import Saved from "./components/Saved";
 import {
   Button,
   Container,
@@ -14,13 +14,27 @@ import {
   Header
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
-
+const getDrizzleWeb3 = require("@drizzle-utils/get-web3");
+const createDrizzleUtils = require("@drizzle-utils/core");
 
 export default function App() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState();
+  const [web3, setWeb3] = useState()
+  const [account, setAccount] = useState()
+
+  const getWeb3 = async () => {
+    // initialize the tooling
+    const web3 = await getDrizzleWeb3();
+    const drizzleUtils = await createDrizzleUtils({ web3 });
+    const accounts = await drizzleUtils.getAccounts();
+
+    setWeb3(web3)
+    setAccount(accounts[0])
+  };
 
   useEffect(() => {
+    getWeb3()
     document.title = "OpenLaw Summoner";
   }, []);
 
@@ -31,8 +45,9 @@ export default function App() {
   const handleToggle = () => setVisible(!visible);
 
   const renderForm = () => {
-    if (index == 0) return <Generate renderForm={renderForm} setIndex={setIndex}/>;
-    if (index == 1) return <Saved />
+    if (index == 0)
+      return <Generate renderForm={renderForm} setIndex={setIndex} />;
+    if (index == 1) return <Saved />;
   };
 
   const leftItems = [
