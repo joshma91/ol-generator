@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Radio } from "semantic-ui-react";
+import { Table, Radio, Icon } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 
@@ -22,16 +22,17 @@ export default function TemplateList({
     <>
       <Radio
         label="Show templates I added"
-        style={{fontWeight:"bold"}}
+        style={{ fontWeight: "bold" }}
         toggle
         value={checked}
         onClick={() => setChecked(!checked)}
       />
-      <Table celled striped >
+      <Table celled striped>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell width={10}>OpenLaw Template</Table.HeaderCell>
             <Table.HeaderCell width={6}>Date Added</Table.HeaderCell>
+            {checked ? <Table.HeaderCell></Table.HeaderCell> : null}
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -60,6 +61,7 @@ export default function TemplateList({
                 <Table.Cell width={6}>
                   {template.createdAt.substring(0, 10)}
                 </Table.Cell>
+                {checked ? <Table.Cell><Icon name='x' color='red'/></Table.Cell> : null}
               </Table.Row>
             );
           })}
