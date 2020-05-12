@@ -4,7 +4,6 @@ type Query {
   templates: [Template!]!
 }
 
-
 type Template {
   id: ID!
   description: String!
@@ -13,6 +12,12 @@ type Template {
   account: String
 }
 
+input TemplateWhereUniqueInput {
+  id: ID
+}
+
 type Mutation {
-  save(name: String!, description: String!, account: String): Template!
+  createTemplate (name: String!, description: String!, account: String): Template!
+  # deleteTemplate (id: ID!) : Template!
+  deleteTemplate (where: TemplateWhereUniqueInput!): Template!
 }

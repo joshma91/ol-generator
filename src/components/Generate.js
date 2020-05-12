@@ -8,19 +8,9 @@ import { useMutation } from "@apollo/react-hooks";
 
 import gql from "graphql-tag";
 
-const TEST_QUERY = gql`
-  query {
-    templates {
-      id
-      description
-      name
-    }
-  }
-`;
-
 const SAVE_MUTATION = gql`
   mutation($name: String!, $description: String!, $account: String) {
-    save(name: $name, description: $description, account: $account) {
+    createTemplate(name: $name, description: $description, account: $account) {
       id
       createdAt
       description

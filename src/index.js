@@ -11,8 +11,8 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { BrowserRouter } from 'react-router-dom'
 
 const link = createHttpLink({
-  // uri: 'http://localhost:4000'
-  uri: 'https://ol-generator.joshma91.now.sh/'
+  uri: 'http://localhost:4000'
+  // uri: 'https://ol-generator.joshma91.now.sh/'
 })
 
 const client = new ApolloClient({
