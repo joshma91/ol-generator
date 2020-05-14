@@ -14,6 +14,7 @@ import {
   Header
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
+import { Switch, Route, Redirect, Link } from "react-router-dom";
 const getDrizzleWeb3 = require("@drizzle-utils/get-web3");
 const createDrizzleUtils = require("@drizzle-utils/core");
 
@@ -46,55 +47,45 @@ export default function App() {
   const handleToggle = () => setVisible(!visible);
 
   const renderForm = () => {
-    if (index == 0)
-      return (
-        <Generate
-          renderForm={renderForm}
-          setIndex={setIndex}
-          account={account}
-        />
-      );
-    if (index == 1) return <Saved key={Math.random()} account={account} />;
+    return (
+      <Container style={{ margin: "5em" }}>
+        <Switch>
+          <Route exact path="/" render={() => <Redirect to="/summon" />} />
+          <Route
+            exact
+            path="/summon"
+            render={props => <Generate {...props} key={key} account={account} />}
+          />
+          <Route
+            exact
+            path="/saved"
+            render={props => <Saved {...props} key={key} account={account} />}
+          />
+        </Switch>
+      </Container>
+    );
   };
 
   const leftItems = [
-    {
-      as: "a",
-      content: "OpenLaw Summoner",
-      onClick: () => {
-        setIndex(0);
-        setVisible(false);
-      },
-      key: "Generate"
-    },
-    {
-      as: "a",
-      content: "Saved Templates",
-      onClick: () => {
-        setIndex(1);
-        setVisible(false);
-      },
-      key: "Saved"
-    }
+    <Link to="/summon"> OpenLaw Summoner </Link>,
+    <Link to="/saved"> Saved Templates </Link>
   ];
+
   return (
     <div>
-      <div>
-        <Responsive {...Responsive.onlyMobile}>
-          <NavBarMobile
-            leftItems={leftItems}
-            onPusherClick={handlePusher}
-            onToggle={handleToggle}
-            visible={visible}
-          >
-            <NavBarChildren>{renderForm()}</NavBarChildren>
-          </NavBarMobile>
-        </Responsive>
-        <Responsive minWidth={Responsive.onlyTablet.minWidth}>
-          <NavBarDesktop leftItems={leftItems} />
-          <NavBarChildren>{renderForm()}</NavBarChildren>
-        </Responsive>
-      </div>
+      <Responsive {...Responsive.onlyMobile}>
+        <NavBarMobile
+          leftItems={leftItems}
+          onPusherClick={handlePusher}
+          onToggle={handleToggle}
+          visible={visible}
+        >
+          {renderForm()}
+        </NavBarMobile>
+      </Responsive>
+      <Responsive minWidth={Responsive.onlyTablet.minWidth}>
+        <NavBarDesktop leftItems={leftItems}/>{renderForm()}
+      </Responsive>
     </div>
   );
 }
@@ -104,7 +95,6 @@ const NavBarMobile = ({
   leftItems,
   onPusherClick,
   onToggle,
-  rightItems = [],
   visible
 }) => (
   <Sidebar.Pushable style={{ transform: "none" }}>
@@ -118,9 +108,9 @@ const NavBarMobile = ({
       style={{ paddingTop: "25px" }}
       width="thin"
     >
-      {_.map(leftItems, item => (
-        <Menu.Item {...item} />
-      ))}
+      {leftItems.map(item => {
+        return <Menu.Item>{item}</Menu.Item>;
+      })}
     </Sidebar>
     <Sidebar.Pusher
       dimmed={visible}
@@ -143,11 +133,6 @@ const NavBarMobile = ({
             Open Esquire
           </Header>
         </Menu.Item>
-        <Menu.Menu position="right">
-          {_.map(rightItems, item => (
-            <Menu.Item {...item} />
-          ))}
-        </Menu.Menu>
       </Menu>
       {children}
     </Sidebar.Pusher>
@@ -165,12 +150,8 @@ const NavBarDesktop = ({ leftItems }) => (
         Open Esquire
       </Header>
     </Menu.Item>
-    {_.map(leftItems, item => (
-      <Menu.Item {...item} />
-    ))}
+    {leftItems.map(item => {
+      return <Menu.Item>{item}</Menu.Item>;
+    })}
   </Menu>
-);
-
-const NavBarChildren = ({ children }) => (
-  <Container style={{ marginTop: "5em" }}>{children}</Container>
 );

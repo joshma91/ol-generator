@@ -20,7 +20,7 @@ const SAVE_MUTATION = gql`
   }
 `;
 
-export default function Generate({ setIndex, renderForm, account }) {
+export default function Generate({ setIndex, renderForm, account, incrementKey }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
@@ -52,6 +52,7 @@ export default function Generate({ setIndex, renderForm, account }) {
           <span className="fake-link"
             onClick={() => {
               setIndex(1);
+              incrementKey()
               renderForm();
             }}
           >
@@ -67,6 +68,7 @@ export default function Generate({ setIndex, renderForm, account }) {
           <span className="fake-link"
             onClick={() => {
               setIndex(1);
+              incrementKey()
               renderForm();
             }}
           >
