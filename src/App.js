@@ -15,6 +15,7 @@ import {
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import { Switch, Route, Redirect, Link } from "react-router-dom";
+import { useHistory } from "react-router";
 const getDrizzleWeb3 = require("@drizzle-utils/get-web3");
 const createDrizzleUtils = require("@drizzle-utils/core");
 
@@ -24,6 +25,7 @@ export default function App() {
   const [web3, setWeb3] = useState();
   const [account, setAccount] = useState();
   const [key, setKey] = useState(0);
+  const history = useHistory();
 
   const getWeb3 = async () => {
     // initialize the tooling
@@ -50,16 +52,21 @@ export default function App() {
     return (
       <Container style={{ margin: "5em" }}>
         <Switch>
+          <Route path="/reload" component={null} key="reload" />
           <Route exact path="/" render={() => <Redirect to="/summon" />} />
           <Route
             exact
             path="/summon"
-            render={props => <Generate {...props} key={key} account={account} />}
+            render={props => (
+              <Generate {...props} key={Math.random} account={account} />
+            )}
           />
           <Route
             exact
             path="/saved"
-            render={props => <Saved {...props} key={key} account={account} />}
+            render={props => (
+              <Saved {...props} key={Math.random} account={account} />
+            )}
           />
         </Switch>
       </Container>
@@ -68,7 +75,17 @@ export default function App() {
 
   const leftItems = [
     <Link to="/summon"> OpenLaw Summoner </Link>,
-    <Link to="/saved"> Saved Templates </Link>
+    <Link
+      to="/saved"
+      onClick={() => {
+        setTimeout(() => {
+          window.location.reload();
+        });
+      }}
+    >
+      {" "}
+      Saved Templates{" "}
+    </Link>
   ];
 
   return (
@@ -84,7 +101,8 @@ export default function App() {
         </NavBarMobile>
       </Responsive>
       <Responsive minWidth={Responsive.onlyTablet.minWidth}>
-        <NavBarDesktop leftItems={leftItems}/>{renderForm()}
+        <NavBarDesktop leftItems={leftItems} />
+        {renderForm()}
       </Responsive>
     </div>
   );

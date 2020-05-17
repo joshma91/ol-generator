@@ -5,6 +5,7 @@ import "openlaw-elements/dist/openlaw-elements.min.css";
 import OLForm from "./OLForm";
 import { Query } from "react-apollo";
 import { useMutation } from "@apollo/react-hooks";
+import { Switch, Route, Redirect, Link } from "react-router-dom";
 
 import gql from "graphql-tag";
 
@@ -20,14 +21,14 @@ const SAVE_MUTATION = gql`
   }
 `;
 
-export default function Generate({ setIndex, renderForm, account, incrementKey }) {
+export default function Generate({ account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
   const [loadSuccess, setLoadSuccess] = useState();
   const [query, setQuery] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
-  
+
   const openLawConfig = {
     server: process.env.REACT_APP_URL,
     templateName: process.env.REACT_APP_TEMPLATE_NAME,
@@ -44,20 +45,25 @@ export default function Generate({ setIndex, renderForm, account, incrementKey }
   const uploadTemplateID = async () => {
     try {
       await saveTemplate({
-        variables: { name: templateName, description: templateName, account: account }
+        variables: {
+          name: templateName,
+          description: templateName,
+          account: account
+        }
       });
       setQuery(
         <Item.Description>
           This template was has been saved for you. View it{" "}
-          <span className="fake-link"
+          <Link
+            to="/saved"
             onClick={() => {
-              setIndex(1);
-              incrementKey()
-              renderForm();
+              setTimeout(() => {
+                window.location.reload();
+              });
             }}
           >
             here
-          </span>
+          </Link>
         </Item.Description>
       );
     } catch (err) {
@@ -65,15 +71,16 @@ export default function Generate({ setIndex, renderForm, account, incrementKey }
       setQuery(
         <Item.Description>
           This template was previously saved. View it{" "}
-          <span className="fake-link"
+          <Link
+            to="/saved"
             onClick={() => {
-              setIndex(1);
-              incrementKey()
-              renderForm();
+              setTimeout(() => {
+                window.location.reload();
+              });
             }}
           >
             here
-          </span>
+          </Link>
         </Item.Description>
       );
     }
@@ -85,7 +92,7 @@ export default function Generate({ setIndex, renderForm, account, incrementKey }
 
   return (
     <>
-     <h2>View an OpenLaw Template</h2>
+      <h2>View an OpenLaw Template</h2>
       <Form>
         <Form.Field
           control={Input}
