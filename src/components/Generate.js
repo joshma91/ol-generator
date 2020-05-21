@@ -67,7 +67,6 @@ export default function Generate({ account }) {
         </Item.Description>
       );
     } catch (err) {
-      console.log(err);
       setQuery(
         <Item.Description>
           This template was previously saved. View it{" "}

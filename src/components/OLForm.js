@@ -41,43 +41,36 @@ class OLForm extends React.Component {
   };
 
   componentDidMount = async () => {
-    console.log(openLawConfig.userName);
     //const { web3, accounts, contract } = this.props;
     //create an instance of the API client with url as parameter
     apiClient
       .login(openLawConfig.userName, openLawConfig.password)
-      .then(console.log);
 
     //Retrieve your OpenLaw template by name, use async/await
     const template = await apiClient.getTemplate(this.state.templateName);
-    console.log(template);
-
+    
     //pull properties off of JSON and make into variables
     const title = template.title;
 
     //Retreive the OpenLaw Template, including MarkDown
     const content = template.content;
-    console.log("template..", template);
-
+    
     //Get the most recent version of the OpenLaw API Tutorial Template
     const versions = await apiClient.getTemplateVersions(
       this.state.templateName,
       20,
       1
     );
-    console.log("versions..", versions[0], versions.length);
-
+    
     //Get the creatorID from the template.
     const creatorId = versions[0].creatorId;
-    console.log("creatorId..", creatorId);
-
+    
     //Get my compiled Template, for use in rendering the HTML in previewTemplate
     const compiledTemplate = await Openlaw.compileTemplate(content);
     if (compiledTemplate.isError) {
       throw "template error" + compiledTemplate.errorMessage;
     }
-    console.log("my compiled template..", compiledTemplate);
-
+    
     const parameters = {};
     const { executionResult, errorMessage } = await Openlaw.execute(
       compiledTemplate.compiledTemplate,
@@ -85,16 +78,14 @@ class OLForm extends React.Component {
       parameters
     );
 
-    console.log("execution result:", executionResult);
-
+    
     // ** This is helpful for logging in development, or throwing exceptions at runtime.
     if (errorMessage) {
       console.error("Openlaw Execution Error:", errorMessage);
     }
 
     const variables = await Openlaw.getExecutedVariables(executionResult, {});
-    console.log("variables:", variables);
-
+    
     this.setState({
       title,
       template,
@@ -128,8 +119,7 @@ class OLForm extends React.Component {
 
   setTemplatePreview = async () => {
     const { parameters, compiledTemplate } = this.state;
-    console.log(parameters);
-
+    
     const executionResult = await Openlaw.execute(
       compiledTemplate.compiledTemplate,
       {},
@@ -171,29 +161,23 @@ class OLForm extends React.Component {
       //login to api
       this.setState({ loading: true }, async () => {
         apiClient.login(openLawConfig.userName, openLawConfig.password);
-        console.log("apiClient logged in");
-
+        
         //add Open Law params to be uploaded
         const uploadParams = await this.buildOpenLawParamsObj(
           this.state.template,
           this.state.creatorId
         );
-        console.log("parmeters from user..", uploadParams.parameters);
-        console.log("all parameters uploading...", uploadParams);
-
+        
         //uploadDraft, sends a draft contract to "Draft Management", which can be edited.
         const draftId = await apiClient.uploadDraft(uploadParams);
-        console.log("draft id..", draftId);
-
+        
         const contractParams = {
           ...uploadParams,
           draftId
         };
-        console.log(contractParams);
-
+        
         const contractId = await apiClient.uploadContract(contractParams);
-        console.log(contractId);
-
+        
         await apiClient.sendContract([], [], contractId);
 
         await this.setState({ loading: false, success: true, draftId });
