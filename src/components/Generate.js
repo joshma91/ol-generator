@@ -25,7 +25,7 @@ export default function Generate({ account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
-  const [loadSuccess, setLoadSuccess] = useState();
+  const [loadSuccess, setLoadSuccess] = useState(null);
   const [query, setQuery] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
 
@@ -86,7 +86,19 @@ export default function Generate({ account }) {
   };
 
   useEffect(() => {
-    if (showOLForm && loadSuccess) uploadTemplateID();
+    console.log(loadSuccess);
+    if (showOLForm && loadSuccess === null) {
+      setQuery(<Item.Description>Please wait...</Item.Description>);
+    }
+    if (showOLForm && loadSuccess) {
+      uploadTemplateID();
+    } else if (showOLForm && loadSuccess === false) {
+      setQuery(
+        <Item.Description>
+          We've encountered an error, sorry. Please try another template.
+        </Item.Description>
+      );
+    }
   }, [loadSuccess]);
 
   return (

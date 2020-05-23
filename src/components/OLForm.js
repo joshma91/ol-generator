@@ -34,6 +34,8 @@ class OLForm extends React.Component {
     variables: null,
     draftId: "",
 
+    isError: false,
+
     // State variables for preview component
     previewHTML: null,
     loading: false,
@@ -41,62 +43,63 @@ class OLForm extends React.Component {
   };
 
   componentDidMount = async () => {
-    //const { web3, accounts, contract } = this.props;
-    //create an instance of the API client with url as parameter
-    apiClient
-      .login(openLawConfig.userName, openLawConfig.password)
+    this.props.setLoadSuccess(null);
+    try {
+      //const { web3, accounts, contract } = this.props;
+      //create an instance of the API client with url as parameter
+      apiClient.login(openLawConfig.userName, openLawConfig.password);
 
-    //Retrieve your OpenLaw template by name, use async/await
-    const template = await apiClient.getTemplate(this.state.templateName);
-    
-    //pull properties off of JSON and make into variables
-    const title = template.title;
+      //Retrieve your OpenLaw template by name, use async/await
+      const template = await apiClient.getTemplate(this.state.templateName);
 
-    //Retreive the OpenLaw Template, including MarkDown
-    const content = template.content;
-    
-    //Get the most recent version of the OpenLaw API Tutorial Template
-    const versions = await apiClient.getTemplateVersions(
-      this.state.templateName,
-      20,
-      1
-    );
-    
-    //Get the creatorID from the template.
-    const creatorId = versions[0].creatorId;
-    
-    //Get my compiled Template, for use in rendering the HTML in previewTemplate
-    const compiledTemplate = await Openlaw.compileTemplate(content);
-    if (compiledTemplate.isError) {
-      throw "template error" + compiledTemplate.errorMessage;
+      //pull properties off of JSON and make into variables
+      const title = template.title;
+
+      //Retreive the OpenLaw Template, including MarkDown
+      const content = template.content;
+
+      //Get the most recent version of the OpenLaw API Tutorial Template
+      const versions = await apiClient.getTemplateVersions(
+        this.state.templateName,
+        20,
+        1
+      );
+
+      //Get the creatorID from the template.
+      const creatorId = versions[0].creatorId;
+
+      //Get my compiled Template, for use in rendering the HTML in previewTemplate
+      const compiledTemplate = await Openlaw.compileTemplate(content);
+      if (compiledTemplate.isError) {
+        throw "template error" + compiledTemplate.errorMessage;
+      }
+
+      const parameters = {};
+      const { executionResult, errorMessage } = await Openlaw.execute(
+        compiledTemplate.compiledTemplate,
+        {},
+        parameters
+      );
+
+      const variables = await Openlaw.getExecutedVariables(executionResult, {});
+
+      this.setState({
+        title,
+        template,
+        creatorId,
+        compiledTemplate,
+        parameters,
+        executionResult,
+        variables
+      });
+
+      this.props.setLoadSuccess(true);
+    } catch (err) {
+      // ** This is helpful for logging in development, or throwing exceptions at runtime.
+
+      this.props.setLoadSuccess(false);
+      this.setState({ isError: true });
     }
-    
-    const parameters = {};
-    const { executionResult, errorMessage } = await Openlaw.execute(
-      compiledTemplate.compiledTemplate,
-      {},
-      parameters
-    );
-
-    
-    // ** This is helpful for logging in development, or throwing exceptions at runtime.
-    if (errorMessage) {
-      console.error("Openlaw Execution Error:", errorMessage);
-    }
-
-    const variables = await Openlaw.getExecutedVariables(executionResult, {});
-    
-    this.setState({
-      title,
-      template,
-      creatorId,
-      compiledTemplate,
-      parameters,
-      executionResult,
-      variables
-    });
-
-    this.props.setLoadSuccess(true);
   };
 
   onChange = (key, value) => {
@@ -119,7 +122,7 @@ class OLForm extends React.Component {
 
   setTemplatePreview = async () => {
     const { parameters, compiledTemplate } = this.state;
-    
+
     const executionResult = await Openlaw.execute(
       compiledTemplate.compiledTemplate,
       {},
@@ -161,23 +164,23 @@ class OLForm extends React.Component {
       //login to api
       this.setState({ loading: true }, async () => {
         apiClient.login(openLawConfig.userName, openLawConfig.password);
-        
+
         //add Open Law params to be uploaded
         const uploadParams = await this.buildOpenLawParamsObj(
           this.state.template,
           this.state.creatorId
         );
-        
+
         //uploadDraft, sends a draft contract to "Draft Management", which can be edited.
         const draftId = await apiClient.uploadDraft(uploadParams);
-        
+
         const contractParams = {
           ...uploadParams,
           draftId
         };
-        
+
         const contractId = await apiClient.uploadContract(contractParams);
-        
+
         await apiClient.sendContract([], [], contractId);
 
         await this.setState({ loading: false, success: true, draftId });
@@ -197,10 +200,12 @@ class OLForm extends React.Component {
       executionResult,
       previewHTML,
       loading,
-      success
+      success,
+      isError
     } = this.state;
-    if (!this.props.templateName) return null;
+    if (!this.props.templateName || isError) return null;
     if (!executionResult) return <Loader active />;
+
     return (
       <Container text style={{ marginTop: "2em" }}>
         <h1>{this.state.templateName.toUpperCase()}</h1>

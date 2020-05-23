@@ -10,7 +10,6 @@ const resolvers = {
   },
   Mutation: {
     createTemplate: async (root, args, context) => {
-      console.log(args);
       const templates = await context.prisma.templates();
       const nameArr = templates.map(x => x.name.toUpperCase());
       if (nameArr.includes(args.name.toUpperCase()))
