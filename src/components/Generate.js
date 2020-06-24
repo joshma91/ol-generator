@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { APIClient, Openlaw } from "openlaw";
 import { Button, Form, Input, Divider, Item } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
@@ -21,12 +22,19 @@ const SAVE_MUTATION = gql`
   }
 `;
 
+const openLawConfig = {
+  server: process.env.REACT_APP_URL,
+  userName: process.env.REACT_APP_OPENLAW_USER,
+  password: process.env.REACT_APP_OPENLAW_PASSWORD
+};
+
 export default function Generate({ account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
   const [templateName, setTemplateName] = useState(null);
   const [loadSuccess, setLoadSuccess] = useState(null);
   const [query, setQuery] = useState();
+  const [apiClient, setAPIClient] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
 
   const openLawConfig = {
@@ -101,6 +109,20 @@ export default function Generate({ account }) {
     }
   }, [loadSuccess]);
 
+  useEffect(() => {
+    const newApiClient = new APIClient(openLawConfig.server);
+    newApiClient.login(openLawConfig.userName, openLawConfig.password);
+    setAPIClient(newApiClient);
+  }, []);
+
+  const setAutoComplete = val => {
+    setTemplateName(val);
+    setTimeout(async () => {
+      const res = await apiClient.templateSearch(val, 1, 10);
+      console.log(res);
+    }, 500);
+  };
+
   return (
     <>
       <h2>View an OpenLaw Template</h2>
@@ -110,7 +132,7 @@ export default function Generate({ account }) {
           placeholder="Template Name"
           label="OpenLaw Template Name"
           value={templateName}
-          onChange={e => setTemplateName(e.target.value)}
+          onChange={e => setAutoComplete(e.target.value)}
         />
         <Button type="submit" onClick={() => instantiateOLClient()}>
           Submit
