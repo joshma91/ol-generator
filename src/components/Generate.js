@@ -4,6 +4,7 @@ import { Button, Form, Input, Divider, Item } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import "openlaw-elements/dist/openlaw-elements.min.css";
 import OLForm from "./OLForm";
+import Autosuggest from "react-autosuggest";
 import { Query } from "react-apollo";
 import { useMutation } from "@apollo/react-hooks";
 import { Switch, Route, Redirect, Link } from "react-router-dom";
@@ -31,9 +32,10 @@ const openLawConfig = {
 export default function Generate({ account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
-  const [templateName, setTemplateName] = useState(null);
+  const [templateName, setTemplateName] = useState("");
   const [loadSuccess, setLoadSuccess] = useState(null);
   const [query, setQuery] = useState();
+  const [suggestions, setSuggestions] = useState([]);
   const [apiClient, setAPIClient] = useState();
   const [saveTemplate] = useMutation(SAVE_MUTATION);
 
@@ -61,7 +63,7 @@ export default function Generate({ account }) {
       });
       setQuery(
         <Item.Description>
-          This template was has been saved for you. View it{" "}
+          This template has been saved for you. View it{" "}
           <Link
             to="/saved"
             onClick={() => {
@@ -119,8 +121,35 @@ export default function Generate({ account }) {
     setTemplateName(val);
     setTimeout(async () => {
       const res = await apiClient.templateSearch(val, 1, 10);
-      console.log(res);
+      setSuggestions(res.data);
+      console.log(res.data);
     }, 500);
+  };
+
+  const getSuggestionValue = suggestion => suggestion.title;
+  // Use your imagination to render suggestions.
+  const renderSuggestion = suggestion => <div>{suggestion.title}</div>;
+
+  const onSuggestionsFetchRequested = ({ value }) => {
+    setAutoComplete(value);
+  };
+
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
+  function shouldRenderSuggestions() {
+    return templateName.trim().length > 2;
+  }
+
+  const onChange = (event, { newValue }) => {
+    setTemplateName(typeof newValue !== "undefined" ? newValue : "");
+  };
+
+  const inputProps = {
+    placeholder: "Template Name",
+    value: templateName,
+    onChange: onChange
   };
 
   return (
@@ -134,6 +163,17 @@ export default function Generate({ account }) {
           value={templateName}
           onChange={e => setAutoComplete(e.target.value)}
         />
+
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          shouldRenderSuggestions={shouldRenderSuggestions}
+          inputProps={inputProps}
+        />
+
         <Button type="submit" onClick={() => instantiateOLClient()}>
           Submit
         </Button>
