@@ -203,7 +203,7 @@ class OLForm extends React.Component {
       success,
       isError
     } = this.state;
-    if (!this.props.templateName || isError) return null;
+    if (isError) return null;
     if (!executionResult) return <Loader active />;
 
     return (

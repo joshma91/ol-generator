@@ -23,12 +23,6 @@ const SAVE_MUTATION = gql`
   }
 `;
 
-const openLawConfig = {
-  server: process.env.REACT_APP_URL,
-  userName: process.env.REACT_APP_OPENLAW_USER,
-  password: process.env.REACT_APP_OPENLAW_PASSWORD
-};
-
 export default function Generate({ account }) {
   const [showOLForm, setShow] = useState();
   const [key, setKey] = useState(0);
@@ -139,7 +133,7 @@ export default function Generate({ account }) {
   };
 
   function shouldRenderSuggestions() {
-    return templateName.trim().length > 2;
+    return templateName.trim().length > 0;
   }
 
   const onChange = (event, { newValue }) => {
@@ -156,13 +150,6 @@ export default function Generate({ account }) {
     <>
       <h2>View an OpenLaw Template</h2>
       <Form>
-        <Form.Field
-          control={Input}
-          placeholder="Template Name"
-          label="OpenLaw Template Name"
-          value={templateName}
-          onChange={e => setAutoComplete(e.target.value)}
-        />
 
         <Autosuggest
           suggestions={suggestions}
@@ -174,7 +161,7 @@ export default function Generate({ account }) {
           inputProps={inputProps}
         />
 
-        <Button type="submit" onClick={() => instantiateOLClient()}>
+        <Button style={{marginTop: "10px"}} type="submit" onClick={() => instantiateOLClient()}>
           Submit
         </Button>
       </Form>
